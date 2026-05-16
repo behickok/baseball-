@@ -1,0 +1,56 @@
+name: Refresh baseball data
+
+on:
+  schedule:
+    # 11:15 UTC = ~3am Pacific / 7am Eastern, after the previous day's
+    # West-coast games have settled on Baseball-Reference.
+    - cron: "15 11 * * *"
+  workflow_dispatch:
+    inputs:
+      seasons:
+        description: "Space-separated seasons to rebuild (default: current year)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-baseball-data
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install build dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements-build.txt
+
+      - name: Rebuild SQLite database
+        run: |
+          if [ -n "${{ github.event.inputs.seasons }}" ]; then
+            python scripts/build_db.py --seasons ${{ github.event.inputs.seasons }}
+          else
+            python scripts/build_db.py
+          fi
+
+      - name: Commit and push if data changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/baseball.db
+          if git diff --cached --quiet; then
+            echo "No data changes."
+          else
+            git commit -m "chore(data): refresh baseball.db ($(date -u +%Y-%m-%dT%H:%MZ))"
+            git push
+          fi

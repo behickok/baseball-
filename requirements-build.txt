@@ -1,0 +1,4 @@
+# Used by scripts/build_db.py and the GitHub Action only.
+# The deployed Flask runtime does NOT need any of these.
+pybaseball>=2.2.7
+pandas>=2.0

@@ -6,3 +6,5 @@ venv/
 .pybaseball_cache/
 *.log
 .DS_Store
+.vercel/
+# data/baseball.db is intentionally committed.

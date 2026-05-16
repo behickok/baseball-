@@ -59,6 +59,29 @@ a { color: var(--accent); }
   border: 1px solid var(--border);
   font-size: 12px;
 }
+select.season-pill {
+  -webkit-appearance: none;
+  appearance: none;
+  padding-right: 22px;
+  cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+                    linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 12px) 50%, calc(100% - 8px) 50%;
+  background-size: 4px 4px, 4px 4px;
+  background-repeat: no-repeat;
+}
+.banner {
+  background: rgba(245,183,59,0.12);
+  border-bottom: 1px solid rgba(245,183,59,0.4);
+  color: var(--accent);
+  padding: 8px 24px;
+  font-size: 13px;
+}
+.banner code {
+  background: rgba(0,0,0,0.25);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
 
 /* Team picker */
 .team-picker {

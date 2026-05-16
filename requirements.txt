@@ -1,3 +1,1 @@
 flask>=3.0
-pybaseball>=2.2.7
-pandas>=2.0

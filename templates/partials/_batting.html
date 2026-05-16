@@ -1,10 +1,10 @@
 <section class="player-table">
   <div class="team-heading">
     <h2>{{ team_info.name }} batters</h2>
-    <span class="muted">{{ season }} · qualified batters (50+ PA)</span>
+    <span class="muted">{{ season }} · 30+ PA</span>
   </div>
   {% if not players %}
-    <p class="muted">No qualified batters returned for this team yet.</p>
+    <p class="muted">No qualifying batters yet for this team.</p>
   {% else %}
   <table class="data">
     <thead>
@@ -17,20 +17,20 @@
     <tbody>
       {% for p in players %}
       <tr>
-        <td class="player">{{ p.get('Name', '—') }}</td>
-        <td>{{ p.get('G', '—') }}</td>
-        <td>{{ p.get('PA', '—') }}</td>
-        <td>{{ p.get('HR', '—') }}</td>
-        <td>{{ p.get('RBI', '—') }}</td>
-        <td>{{ p.get('SB', '—') }}</td>
-        <td>{{ p.get('BB', '—') }}</td>
-        <td>{{ p.get('SO', '—') }}</td>
-        <td>{{ p.get('AVG')|fmt }}</td>
-        <td>{{ p.get('OBP')|fmt }}</td>
-        <td>{{ p.get('SLG')|fmt }}</td>
-        <td><strong>{{ p.get('OPS')|fmt }}</strong></td>
-        <td>{{ p.get('wRC+', '—') }}</td>
-        <td>{{ p.get('WAR')|fmt }}</td>
+        <td class="player">{{ p.get('name', '—') }}</td>
+        <td>{{ p.get('g', '—') }}</td>
+        <td>{{ p.get('pa', '—') }}</td>
+        <td>{{ p.get('hr', '—') }}</td>
+        <td>{{ p.get('rbi', '—') }}</td>
+        <td>{{ p.get('sb', '—') }}</td>
+        <td>{{ p.get('bb', '—') }}</td>
+        <td>{{ p.get('so', '—') }}</td>
+        <td>{{ p.get('avg')|fmt }}</td>
+        <td>{{ p.get('obp')|fmt }}</td>
+        <td>{{ p.get('slg')|fmt }}</td>
+        <td><strong>{{ p.get('ops')|fmt }}</strong></td>
+        <td>{{ p.get('wrc_plus', '—') }}</td>
+        <td>{{ p.get('war')|fmt }}</td>
       </tr>
       {% endfor %}
     </tbody>

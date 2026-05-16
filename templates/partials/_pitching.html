@@ -1,7 +1,7 @@
 <section class="player-table">
   <div class="team-heading">
     <h2>{{ team_info.name }} pitchers</h2>
-    <span class="muted">{{ season }} · 20+ IP</span>
+    <span class="muted">{{ season }} · 10+ IP</span>
   </div>
   {% if not players %}
     <p class="muted">No qualifying pitchers yet.</p>
@@ -17,22 +17,22 @@
     <tbody>
       {% for p in players %}
       <tr>
-        <td class="player">{{ p.get('Name', '—') }}</td>
-        <td>{{ p.get('W', '—') }}</td>
-        <td>{{ p.get('L', '—') }}</td>
-        <td><strong>{{ p.get('ERA')|fmt }}</strong></td>
-        <td>{{ p.get('G', '—') }}</td>
-        <td>{{ p.get('GS', '—') }}</td>
-        <td>{{ p.get('SV', '—') }}</td>
-        <td>{{ p.get('IP')|fmt }}</td>
-        <td>{{ p.get('SO', '—') }}</td>
-        <td>{{ p.get('BB', '—') }}</td>
-        <td>{{ p.get('HR', '—') }}</td>
-        <td>{{ p.get('WHIP')|fmt }}</td>
-        <td>{{ p.get('FIP')|fmt }}</td>
-        <td>{{ p.get('K/9')|fmt }}</td>
-        <td>{{ p.get('BB/9')|fmt }}</td>
-        <td>{{ p.get('WAR')|fmt }}</td>
+        <td class="player">{{ p.get('name', '—') }}</td>
+        <td>{{ p.get('w', '—') }}</td>
+        <td>{{ p.get('l', '—') }}</td>
+        <td><strong>{{ p.get('era')|fmt }}</strong></td>
+        <td>{{ p.get('g', '—') }}</td>
+        <td>{{ p.get('gs', '—') }}</td>
+        <td>{{ p.get('sv', '—') }}</td>
+        <td>{{ p.get('ip')|fmt }}</td>
+        <td>{{ p.get('so', '—') }}</td>
+        <td>{{ p.get('bb', '—') }}</td>
+        <td>{{ p.get('hr', '—') }}</td>
+        <td>{{ p.get('whip')|fmt }}</td>
+        <td>{{ p.get('fip')|fmt }}</td>
+        <td>{{ p.get('k_9')|fmt }}</td>
+        <td>{{ p.get('bb_9')|fmt }}</td>
+        <td>{{ p.get('war')|fmt }}</td>
       </tr>
       {% endfor %}
     </tbody>

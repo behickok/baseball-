@@ -1,34 +1,74 @@
 # ⚾ Baseball Dashboard
 
-A self-hosted MLB stats dashboard built with **Flask + htmx + pybaseball**. Pick a default team you care about most; switch to any other team on the fly.
+Flask + htmx dashboard for MLB stats. Pick a default team, dig into any other team on the fly. Backed by a **pre-built SQLite database** that's refreshed nightly by a GitHub Action — the deployed app has zero runtime scraping dependencies, so it fits cleanly on Vercel.
+
+## Architecture
+
+```
+┌──────────────────────┐    nightly cron     ┌──────────────────────┐
+│  GitHub Action       │ ───────────────────▶│ scripts/build_db.py  │
+│  refresh-data.yml    │                     │ (pybaseball, pandas) │
+└──────────────────────┘                     └──────────┬───────────┘
+            │                                            │ writes
+            │ commits + pushes                           ▼
+            │                                  ┌──────────────────┐
+            ▼                                  │ data/baseball.db │
+   ┌────────────────┐    auto-deploy          └─────────┬────────┘
+   │ GitHub default │ ───────────────────────────────▶  │ bundled
+   │ branch         │                                    │ into the
+   └────────────────┘                                    ▼ function
+                                              ┌────────────────────┐
+                                              │  Vercel Python fn  │
+                                              │  Flask + sqlite3   │
+                                              └────────────────────┘
+```
+
+- **`app.py`** — Flask app. Reads only from SQLite via stdlib `sqlite3`. No pandas, no pybaseball.
+- **`scripts/build_db.py`** — Run locally or in CI. Hits pybaseball / Baseball-Reference / FanGraphs and writes `data/baseball.db`.
+- **`.github/workflows/refresh-data.yml`** — Cron at 11:15 UTC daily + manual trigger. Re-runs the build script for the current season and commits the new `.db` if anything changed. Vercel redeploys on push.
+- **`api/index.py`** + **`vercel.json`** — Vercel serverless entry point.
 
 ## Features
 
-- **Default team** persisted as a cookie (star button next to the team picker). Survives reloads.
-- **Team picker** for all 30 MLB teams.
-- Tabs (no page reload — htmx swaps the panel):
-  - **Overview** — record, run differential, streak, team OPS/ERA, last 10, next 5
-  - **Schedule** — full season schedule with results
-  - **Team Batting** — qualified batters with AVG/OBP/SLG/OPS/wRC+/WAR
-  - **Team Pitching** — pitchers with ERA/WHIP/FIP/K-9/WAR
-  - **Standings** — all six divisions
-  - **Batting / Pitching leaders** — league top 25 by WAR
-- pybaseball's on-disk cache + in-process TTL cache keep things fast.
-- Errors are caught per panel so one bad upstream call doesn't crash the page.
+- Default team persisted as a cookie (star button next to the team picker).
+- Season picker (whatever seasons are in the DB show up).
+- Tabs with htmx in-place swaps: Overview, Schedule, Team Batting, Team Pitching, Standings, Batting/Pitching Leaders.
+- Footer shows the DB's last-built timestamp so you can tell how fresh it is.
 
-## Run it
+## Local development
 
 ```bash
-pip install -r requirements.txt
-python app.py
+# install runtime + build deps
+pip install -r requirements.txt -r requirements-build.txt
+
+# seed the DB (current season only; ~2 minutes)
+python scripts/build_db.py
+
+# or seed multiple seasons
+python scripts/build_db.py --seasons 2024 2025 2026
+
+# run
+python app.py        # http://localhost:5000
 ```
 
-Then open <http://localhost:5000>.
+## Deploying to Vercel
 
-Set `PORT` to override the port, e.g. `PORT=8000 python app.py`.
+1. Push this repo to GitHub.
+2. Import the repo into Vercel. Framework preset: **Other**. It picks up `vercel.json` automatically.
+3. No env vars are required.
+4. Make sure `data/baseball.db` has been built and committed at least once before the first deploy — otherwise the app will render the "no data loaded yet" panel.
 
-## Notes
+After the initial deploy, the GitHub Action keeps the DB fresh:
+- Daily cron commits any changes to the default branch.
+- Vercel's Git integration redeploys on every push.
+- The Action can also be triggered manually from the Actions tab (with optional `seasons` input to rebuild historical years).
 
-- Data is pulled live from Baseball-Reference and FanGraphs via [pybaseball](https://github.com/jldbc/pybaseball). The very first request for any season is slow while it scrapes; after that it's cached.
-- Season defaults to the current calendar year. If you're poking around in the off-season, the leader/team stat panels for the current year may be empty until opening day.
-- Default team is stored in a `default_team` cookie for one year.
+## Why SQLite and not DuckDB?
+
+- Stdlib (zero runtime deps, smaller Vercel bundle).
+- The queries here are point lookups by `(season, team_abbr)`, not analytics. DuckDB's columnar engine would be overkill.
+- Works out of the box on Vercel's read-only filesystem.
+
+## Why not Cloudflare?
+
+Cloudflare Workers don't run real CPython well (Pyodide-only, no pandas/lxml). To target Cloudflare, the runtime would need to be rewritten in JS using D1 (their hosted SQLite). The build script and schema would carry over unchanged.

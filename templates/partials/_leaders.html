@@ -5,15 +5,13 @@
   </div>
   <table class="data">
     <thead>
-      <tr>{% for c in cols %}<th>{{ c }}</th>{% endfor %}</tr>
+      <tr>{% for _, label in cols %}<th>{{ label }}</th>{% endfor %}</tr>
     </thead>
     <tbody>
       {% for row in rows %}
       <tr>
-        {% for c in cols %}
-          <td {% if c == 'Name' %}class="player"{% endif %}>
-            {{ row[c]|fmt }}
-          </td>
+        {% for key, label in cols %}
+          <td {% if key == 'name' %}class="player"{% endif %}>{{ row[key]|fmt }}</td>
         {% endfor %}
       </tr>
       {% endfor %}
