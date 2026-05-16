@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Baseball Dashboard</title>
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">⚾</span>
+      <h1>Baseball Dashboard</h1>
+      <span class="season-pill">{{ season }}</span>
+    </div>
+
+    <div class="team-picker">
+      <label for="team-select">Viewing</label>
+      <select
+        id="team-select"
+        name="team"
+        hx-get="/team/overview"
+        hx-target="#tab-content"
+        hx-trigger="change"
+        hx-include="[name='season']"
+        hx-on::after-request="
+          document.querySelectorAll('[data-tab]').forEach(b => b.classList.remove('active'));
+          document.querySelector('[data-tab=overview]').classList.add('active');
+          htmx.ajax('GET', '/set-default?just-refresh=1&team=' + this.value, {target:'#default-badge', swap:'outerHTML', source: this}).catch(()=>{});
+          window.currentTeam = this.value;
+        "
+      >
+        {% for abbr, name, lg, div in teams %}
+          <option value="{{ abbr }}" {% if abbr == selected %}selected{% endif %}>
+            {{ name }} ({{ abbr }})
+          </option>
+        {% endfor %}
+      </select>
+
+      <span id="default-badge">
+        {% include "partials/_default_badge.html" %}
+      </span>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button data-tab="overview" class="active"
+      hx-get="/team/overview"
+      hx-target="#tab-content"
+      hx-include="#team-select, [name='season']"
+      hx-on::before-request="setActive(this)">Overview</button>
+    <button data-tab="schedule"
+      hx-get="/team/schedule"
+      hx-target="#tab-content"
+      hx-include="#team-select, [name='season']"
+      hx-on::before-request="setActive(this)">Schedule</button>
+    <button data-tab="batting"
+      hx-get="/team/batting"
+      hx-target="#tab-content"
+      hx-include="#team-select, [name='season']"
+      hx-on::before-request="setActive(this)">Team Batting</button>
+    <button data-tab="pitching"
+      hx-get="/team/pitching"
+      hx-target="#tab-content"
+      hx-include="#team-select, [name='season']"
+      hx-on::before-request="setActive(this)">Team Pitching</button>
+    <button data-tab="standings"
+      hx-get="/standings"
+      hx-target="#tab-content"
+      hx-include="[name='season']"
+      hx-on::before-request="setActive(this)">Standings</button>
+    <button data-tab="leaders-bat"
+      hx-get="/leaders/batting"
+      hx-target="#tab-content"
+      hx-include="[name='season']"
+      hx-on::before-request="setActive(this)">Batting Leaders</button>
+    <button data-tab="leaders-pit"
+      hx-get="/leaders/pitching"
+      hx-target="#tab-content"
+      hx-include="[name='season']"
+      hx-on::before-request="setActive(this)">Pitching Leaders</button>
+
+    <input type="hidden" name="season" value="{{ season }}" />
+  </nav>
+
+  <main id="tab-content"
+        hx-get="/team/overview?team={{ selected }}"
+        hx-trigger="load"
+        hx-swap="innerHTML">
+    <p class="loading">Loading {{ team_map[selected].name }} overview…</p>
+  </main>
+
+  <footer>
+    <small>Data via <a href="https://github.com/jldbc/pybaseball" target="_blank" rel="noreferrer">pybaseball</a> · Baseball-Reference · FanGraphs</small>
+  </footer>
+
+  <script>
+    function setActive(el) {
+      document.querySelectorAll('[data-tab]').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+    }
+    // global htmx loading indicator
+    document.body.addEventListener('htmx:beforeRequest', () => document.body.classList.add('htmx-busy'));
+    document.body.addEventListener('htmx:afterRequest',  () => document.body.classList.remove('htmx-busy'));
+  </script>
+</body>
+</html>

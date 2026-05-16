@@ -1,0 +1,40 @@
+<section class="schedule">
+  <div class="team-heading">
+    <h2>{{ team_info.name }} schedule</h2>
+    <span class="muted">{{ season }} season</span>
+  </div>
+  {% if not games %}
+    <p class="muted">No schedule available.</p>
+  {% else %}
+  <table class="data dense">
+    <thead>
+      <tr>
+        <th>#</th><th>Date</th><th>Opp</th><th>Result</th>
+        <th>R</th><th>RA</th><th>Inn</th><th>Record</th><th>Streak</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for g in games %}
+      <tr>
+        <td>{{ g.get('Gm#', loop.index) }}</td>
+        <td>{{ g.get('Date', '—') }}</td>
+        <td>{{ g.get('Home_Away', '') }} {{ g.get('Opp', '—') }}</td>
+        <td>
+          {% set wl = (g.get('W/L') or '')|string %}
+          {% if wl %}
+            <span class="badge {{ 'win' if wl.startswith('W') else ('loss' if wl.startswith('L') else '') }}">{{ wl }}</span>
+          {% else %}
+            <span class="muted">—</span>
+          {% endif %}
+        </td>
+        <td>{{ g.get('R', '—') }}</td>
+        <td>{{ g.get('RA', '—') }}</td>
+        <td>{{ g.get('Inn', 9) }}</td>
+        <td>{{ g.get('W-L', '—') }}</td>
+        <td>{{ g.get('Streak', '—') }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</section>

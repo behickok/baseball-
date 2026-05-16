@@ -1,0 +1,29 @@
+<section class="standings">
+  <div class="team-heading">
+    <h2>League standings</h2>
+    <span class="muted">{{ season }}</span>
+  </div>
+  <div class="grid-divisions">
+    {% for div in divisions %}
+    <div class="division">
+      <h3>{{ div.label }}</h3>
+      <table class="data dense">
+        <thead>
+          <tr>
+            {% for c in div.cols %}<th>{{ c }}</th>{% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in div.rows %}
+          <tr>
+            {% for c in div.cols %}
+              <td>{{ row[c] }}</td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endfor %}
+  </div>
+</section>

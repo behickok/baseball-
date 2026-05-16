@@ -1,0 +1,39 @@
+<section class="player-table">
+  <div class="team-heading">
+    <h2>{{ team_info.name }} batters</h2>
+    <span class="muted">{{ season }} · qualified batters (50+ PA)</span>
+  </div>
+  {% if not players %}
+    <p class="muted">No qualified batters returned for this team yet.</p>
+  {% else %}
+  <table class="data">
+    <thead>
+      <tr>
+        <th>Player</th><th>G</th><th>PA</th><th>HR</th><th>RBI</th><th>SB</th>
+        <th>BB</th><th>SO</th><th>AVG</th><th>OBP</th><th>SLG</th><th>OPS</th>
+        <th>wRC+</th><th>WAR</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in players %}
+      <tr>
+        <td class="player">{{ p.get('Name', '—') }}</td>
+        <td>{{ p.get('G', '—') }}</td>
+        <td>{{ p.get('PA', '—') }}</td>
+        <td>{{ p.get('HR', '—') }}</td>
+        <td>{{ p.get('RBI', '—') }}</td>
+        <td>{{ p.get('SB', '—') }}</td>
+        <td>{{ p.get('BB', '—') }}</td>
+        <td>{{ p.get('SO', '—') }}</td>
+        <td>{{ p.get('AVG')|fmt }}</td>
+        <td>{{ p.get('OBP')|fmt }}</td>
+        <td>{{ p.get('SLG')|fmt }}</td>
+        <td><strong>{{ p.get('OPS')|fmt }}</strong></td>
+        <td>{{ p.get('wRC+', '—') }}</td>
+        <td>{{ p.get('WAR')|fmt }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</section>

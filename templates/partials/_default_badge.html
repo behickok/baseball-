@@ -1,0 +1,21 @@
+{# Renders the star button + current-default label. Receives `team` (currently viewed) and `team_map`. #}
+{% set viewing = team %}
+{% set is_default = request.cookies.get('default_team') == viewing %}
+<span id="default-badge" class="default-badge">
+  <button
+    type="button"
+    class="star {{ 'on' if is_default else '' }}"
+    title="{{ 'Already your default team' if is_default else 'Set as default team' }}"
+    hx-get="/set-default?team={{ viewing }}"
+    hx-target="#default-badge"
+    hx-swap="outerHTML"
+    {% if is_default %}disabled{% endif %}>
+    {{ '★' if is_default else '☆' }}
+  </button>
+  <span class="default-label">
+    Default:
+    <strong>
+      {{ team_map[request.cookies.get('default_team') or 'NYY'].name }}
+    </strong>
+  </span>
+</span>

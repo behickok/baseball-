@@ -1,0 +1,22 @@
+<section class="player-table">
+  <div class="team-heading">
+    <h2>{{ title }}</h2>
+    <span class="muted">{{ season }} · top 25 by WAR</span>
+  </div>
+  <table class="data">
+    <thead>
+      <tr>{% for c in cols %}<th>{{ c }}</th>{% endfor %}</tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        {% for c in cols %}
+          <td {% if c == 'Name' %}class="player"{% endif %}>
+            {{ row[c]|fmt }}
+          </td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>

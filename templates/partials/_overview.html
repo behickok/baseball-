@@ -1,0 +1,93 @@
+<section class="overview">
+  <div class="team-heading">
+    <h2>{{ team_info.name }}</h2>
+    <span class="muted">{{ team_info.league }} {{ team_info.division }} · {{ season }}</span>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-label">Record</div>
+      <div class="card-value">{{ record.W }}–{{ record.L }}</div>
+      <div class="card-sub">{{ record.pct }} win pct</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Run differential</div>
+      <div class="card-value">
+        {% set diff = record.rs - record.ra %}
+        {{ '+' if diff > 0 else '' }}{{ diff }}
+      </div>
+      <div class="card-sub">{{ record.rs }} RS · {{ record.ra }} RA</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Streak</div>
+      <div class="card-value">{{ record.streak }}</div>
+      <div class="card-sub">Recent form</div>
+    </div>
+    {% if team_bat_row and team_bat_row.get('OPS') %}
+    <div class="card">
+      <div class="card-label">Team OPS</div>
+      <div class="card-value">{{ team_bat_row['OPS']|fmt }}</div>
+      <div class="card-sub">{{ team_bat_row.get('HR', '—') }} HR · {{ team_bat_row.get('AVG', '—')|fmt }} AVG</div>
+    </div>
+    {% endif %}
+    {% if team_pit_row and team_pit_row.get('ERA') %}
+    <div class="card">
+      <div class="card-label">Team ERA</div>
+      <div class="card-value">{{ team_pit_row['ERA']|fmt }}</div>
+      <div class="card-sub">{{ team_pit_row.get('WHIP', '—')|fmt }} WHIP · {{ team_pit_row.get('SO', '—') }} K</div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="split-pane">
+    <div class="pane">
+      <h3>Last 10 games</h3>
+      {% if sched_err %}
+        <p class="error">{{ sched_err }}</p>
+      {% elif not recent %}
+        <p class="muted">No games played yet.</p>
+      {% else %}
+      <table class="data">
+        <thead>
+          <tr>
+            <th>Date</th><th>Opp</th><th>Result</th><th>Score</th><th>Streak</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for g in recent %}
+          <tr>
+            <td>{{ g.get('Date', '—') }}</td>
+            <td>{{ g.get('Home_Away', '') }} {{ g.get('Opp', '—') }}</td>
+            <td>
+              {% set wl = (g.get('W/L') or '')|string %}
+              <span class="badge {{ 'win' if wl.startswith('W') else ('loss' if wl.startswith('L') else '') }}">
+                {{ wl or '—' }}
+              </span>
+            </td>
+            <td>{{ g.get('R', '—') }}–{{ g.get('RA', '—') }}</td>
+            <td>{{ g.get('Streak', '—') }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </div>
+
+    <div class="pane">
+      <h3>Next up</h3>
+      {% if not next_games %}
+        <p class="muted">No upcoming games scheduled.</p>
+      {% else %}
+      <ul class="upcoming">
+        {% for g in next_games %}
+        <li>
+          <span class="date">{{ g.get('Date', '—') }}</span>
+          <span class="opp">{{ g.get('Home_Away', '') }} {{ g.get('Opp', '—') }}</span>
+          <span class="time muted">{{ g.get('Time', '') }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+  </div>
+</section>
