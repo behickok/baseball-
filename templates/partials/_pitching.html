@@ -1,7 +1,7 @@
 <section class="player-table">
   <div class="team-heading">
     <h2>{{ team_info.name }} pitchers</h2>
-    <span class="muted">{{ season }} · 10+ IP</span>
+    <span class="muted">{{ season }} · 1+ IP</span>
   </div>
   {% if not players %}
     <p class="muted">No qualifying pitchers yet.</p>
@@ -11,7 +11,7 @@
       <tr>
         <th>Player</th><th>W</th><th>L</th><th>ERA</th><th>G</th><th>GS</th>
         <th>SV</th><th>IP</th><th>SO</th><th>BB</th><th>HR</th>
-        <th>WHIP</th><th>FIP</th><th>K/9</th><th>BB/9</th><th>WAR</th>
+        <th>WHIP</th><th>K/9</th><th>BB/9</th>
       </tr>
     </thead>
     <tbody>
@@ -29,10 +29,8 @@
         <td>{{ p.get('bb', '—') }}</td>
         <td>{{ p.get('hr', '—') }}</td>
         <td>{{ p.get('whip')|fmt }}</td>
-        <td>{{ p.get('fip')|fmt }}</td>
         <td>{{ p.get('k_9')|fmt }}</td>
         <td>{{ p.get('bb_9')|fmt }}</td>
-        <td>{{ p.get('war')|fmt }}</td>
       </tr>
       {% endfor %}
     </tbody>

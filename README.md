@@ -24,7 +24,7 @@ Flask + htmx dashboard for MLB stats. Pick a default team, dig into any other te
 ```
 
 - **`app.py`** — Flask app. Reads only from SQLite via stdlib `sqlite3`. No pandas, no pybaseball.
-- **`scripts/build_db.py`** — Run locally or in CI. Hits pybaseball / Baseball-Reference / FanGraphs and writes `data/baseball.db`.
+- **`scripts/build_db.py`** — Run locally or in CI. Hits the **MLB Stats API** (`statsapi.mlb.com`) and writes `data/baseball.db`. Just `requests` + stdlib — no scraping, no IP blocks.
 - **`.github/workflows/refresh-data.yml`** — Cron at 11:15 UTC daily + manual trigger. Re-runs the build script for the current season and commits the new `.db` if anything changed. Vercel redeploys on push.
 - **`api/index.py`** + **`vercel.json`** — Vercel serverless entry point.
 
@@ -68,6 +68,12 @@ After the initial deploy, the GitHub Action keeps the DB fresh:
 - Stdlib (zero runtime deps, smaller Vercel bundle).
 - The queries here are point lookups by `(season, team_abbr)`, not analytics. DuckDB's columnar engine would be overkill.
 - Works out of the box on Vercel's read-only filesystem.
+
+## Why MLB Stats API and not FanGraphs / Baseball-Reference?
+
+The first iteration used pybaseball, which scrapes Baseball-Reference and FanGraphs. Both increasingly block automated traffic — even GitHub Actions IPs get 403s from FanGraphs. The MLB Stats API is MLB's own JSON API, free, unauthenticated, and reliable.
+
+Trade-off: no FanGraphs-only metrics (wRC+, fWAR, FIP). All the standard rate stats (AVG/OBP/SLG/OPS, ERA/WHIP/K-9/BB-9) match exactly.
 
 ## Why not Cloudflare?
 

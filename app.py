@@ -272,10 +272,9 @@ def team_batting():
     team = selected_team()
     season = selected_season()
     players = query(
-        "SELECT name, g, pa, ab, h, hr, rbi, sb, bb, so, "
-        "       avg, obp, slg, ops, wrc_plus, war "
+        "SELECT name, g, pa, ab, h, hr, rbi, sb, bb, so, avg, obp, slg, ops "
         "FROM batters WHERE season = ? AND team_abbr = ? "
-        "ORDER BY war DESC NULLS LAST, ops DESC NULLS LAST",
+        "ORDER BY ops DESC NULLS LAST, pa DESC NULLS LAST",
         (season, team),
     )
     return render_template(
@@ -291,10 +290,9 @@ def team_pitching():
     team = selected_team()
     season = selected_season()
     players = query(
-        "SELECT name, w, l, era, g, gs, sv, ip, so, bb, hr, "
-        "       whip, fip, k_9, bb_9, war "
+        "SELECT name, w, l, era, g, gs, sv, ip, so, bb, hr, whip, k_9, bb_9 "
         "FROM pitchers WHERE season = ? AND team_abbr = ? "
-        "ORDER BY war DESC NULLS LAST, era ASC NULLS LAST",
+        "ORDER BY ip DESC NULLS LAST, era ASC NULLS LAST",
         (season, team),
     )
     return render_template(
@@ -342,21 +340,19 @@ def leaders_batting():
         return render_template("partials/_empty_db.html")
     season = selected_season()
     rows = query(
-        "SELECT name, team_abbr, g, pa, hr, rbi, sb, "
-        "       avg, obp, slg, ops, wrc_plus, war "
-        "FROM batters WHERE season = ? "
-        "ORDER BY war DESC NULLS LAST LIMIT 25",
+        "SELECT name, team_abbr, g, pa, hr, rbi, sb, avg, obp, slg, ops "
+        "FROM batters WHERE season = ? AND pa >= 50 "
+        "ORDER BY ops DESC NULLS LAST LIMIT 25",
         (season,),
     )
     cols = [
         ("name", "Name"), ("team_abbr", "Team"), ("g", "G"), ("pa", "PA"),
         ("hr", "HR"), ("rbi", "RBI"), ("sb", "SB"),
         ("avg", "AVG"), ("obp", "OBP"), ("slg", "SLG"), ("ops", "OPS"),
-        ("wrc_plus", "wRC+"), ("war", "WAR"),
     ]
     return render_template(
         "partials/_leaders.html",
-        season=season, title="Batting leaders", cols=cols, rows=rows,
+        season=season, title="OPS leaders", cols=cols, rows=rows,
     )
 
 
@@ -366,21 +362,20 @@ def leaders_pitching():
         return render_template("partials/_empty_db.html")
     season = selected_season()
     rows = query(
-        "SELECT name, team_abbr, w, l, era, g, gs, ip, so, "
-        "       whip, fip, k_9, war "
-        "FROM pitchers WHERE season = ? "
-        "ORDER BY war DESC NULLS LAST LIMIT 25",
+        "SELECT name, team_abbr, w, l, era, g, gs, ip, so, whip, k_9 "
+        "FROM pitchers WHERE season = ? AND ip >= 20 "
+        "ORDER BY era ASC NULLS LAST LIMIT 25",
         (season,),
     )
     cols = [
         ("name", "Name"), ("team_abbr", "Team"),
         ("w", "W"), ("l", "L"), ("era", "ERA"),
         ("g", "G"), ("gs", "GS"), ("ip", "IP"), ("so", "SO"),
-        ("whip", "WHIP"), ("fip", "FIP"), ("k_9", "K/9"), ("war", "WAR"),
+        ("whip", "WHIP"), ("k_9", "K/9"),
     ]
     return render_template(
         "partials/_leaders.html",
-        season=season, title="Pitching leaders", cols=cols, rows=rows,
+        season=season, title="ERA leaders (20+ IP)", cols=cols, rows=rows,
     )
 
 
